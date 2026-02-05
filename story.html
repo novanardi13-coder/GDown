@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petualangan Teks dengan Item</title>
+<style>
+  body {background:#111; color:#eee; font-family:'Courier New', monospace; padding:20px; line-height:1.6;}
+  #story {margin-bottom:20px;}
+  .btn {background:linear-gradient(to right,#3b82f6,#22d3ee);border:none;padding:10px 20px;margin:5px;color:white;cursor:pointer;border-radius:5px;font-weight:bold;}
+  .btn:hover {background:linear-gradient(to right,#22d3ee,#3b82f6);}
+  #status {margin-top:20px;font-size:14px;color:#aaa;}
+  #inventory {margin-top:10px;}
+  .item-btn {background:#22c55e;}
+  .item-btn:hover {background:#16a34a;}
+</style>
+</head>
+<body>
+
+<h2>Petualangan Teks + Item</h2>
+<div id="story"></div>
+<div id="choices"></div>
+<div id="inventory"></div>
+<div id="status">
+  HP: <span id="hp">100</span> | Skor: <span id="score">0</span>
+</div>
+
+<script>
+let player = {hp:100, score:0, inventory:[]};
+
+// ======= ITEM =======
+function addItem(item) {
+  player.inventory.push(item);
+  updateInventory();
+}
+
+function useItem(itemName) {
+  const index = player.inventory.indexOf(itemName);
+  if(index>=0){
+    player.inventory.splice(index,1);
+    if(itemName==="Ramuan") { 
+      player.hp += 30;
+      alert("Kamu menggunakan Ramuan! HP bertambah 30."); 
+    }
+    if(itemName==="Pedang") { 
+      alert("Pedang siap digunakan saat melawan monster."); 
+    }
+    updateStatus();
+    updateInventory();
+  }
+}
+
+function updateInventory() {
+  const invDiv = document.getElementById("inventory");
+  invDiv.innerHTML = "Inventori: ";
+  player.inventory.forEach(item=>{
+    const btn = document.createElement("button");
+    btn.className="btn item-btn";
+    btn.innerText=item;
+    btn.onclick = ()=>useItem(item);
+    invDiv.appendChild(btn);
+  });
+}
+
+// ======= GAME EVENTS =======
+const events = [
+  {
+    id:"start",
+    text:"Kamu bangun di hutan gelap. Ada dua jalan di depanmu.",
+    choices:[
+      {text:"Jalan kiri", next:"monster1"},
+      {text:"Jalan kanan", next:"harta1"}
+    ]
+  },
+  {
+    id:"monster1",
+    text:"Monster muncul! Kamu terluka 20 HP.",
+    hpChange:-20,
+    scoreChange:10,
+    choices:[
+      {text:"Lawan", next:"fight1"},
+      {text:"Lari", next:"escape1"}
+    ]
+  },
+  {
+    id:"fight1",
+    text:"Kamu menghadapi monster dengan berani.",
+    choices:[
+      {text:"Gunakan Pedang (jika ada)", next:"monsterDead"},
+      {text:"Serang biasa", next:"monsterDead"}
+    ]
+  },
+  {
+    id:"monsterDead",
+    text:"Monster dikalahkan! Skor bertambah 30.",
+    hpChange:-10,
+    scoreChange:30,
+    choices:[
+      {text:"Lanjut", next:"explore1"}
+    ]
+  },
+  {
+    id:"escape1",
+    text:"Kamu lari, kehilangan 5 HP tapi selamat.",
+    hpChange:-5,
+    scoreChange:5,
+    choices:[
+      {text:"Lanjut", next:"explore1"}
+    ]
+  },
+  {
+    id:"harta1",
+    text:"Kamu menemukan harta tersembunyi! Dapat item Pedang.",
+    choices:[
+      {text:"Ambil Pedang", next:"explore1", action:()=>addItem("Pedang")},
+      {text:"Tinggalkan", next:"explore1"}
+    ]
+  },
+  {
+    id:"explore1",
+    text:"Kamu berjalan lebih jauh dan menemukan Ramuan.",
+    choices:[
+      {text:"Ambil Ramuan", next:"crossroad", action:()=>addItem("Ramuan")},
+      {text:"Tinggalkan", next:"crossroad"}
+    ]
+  },
+  {
+    id:"crossroad",
+    text:"Ada dua jalan: kiri ke sungai, kanan ke gua.",
+    choices:[
+      {text:"Sungai", next:"river"},
+      {text:"Gua", next:"cave"}
+    ]
+  },
+  {
+    id:"river",
+    text:"Kamu naik perahu dan mendapat skor +20.",
+    scoreChange:20,
+    choices:[
+      {text:"Lanjut", next:"ending1"}
+    ]
+  },
+  {
+    id:"cave",
+    text:"Di gua gelap, monster muncul lagi! Gunakan Pedang atau lari.",
+    choices:[
+      {text:"Gunakan Pedang (jika ada)", next:"caveMonsterDead"},
+      {text:"Lari", next:"caveEscape"}
+    ]
+  },
+  {
+    id:"caveMonsterDead",
+    text:"Monster di gua kalah! Skor +50.",
+    hpChange:-10,
+    scoreChange:50,
+    choices:[
+      {text:"Lanjut", next:"ending1"}
+    ]
+  },
+  {
+    id:"caveEscape",
+    text:"Kamu berhasil lari tapi kehilangan 15 HP.",
+    hpChange:-15,
+    scoreChange:5,
+    choices:[
+      {text:"Lanjut", next:"ending1"}
+    ]
+  },
+  {
+    id:"ending1",
+    text:"Petualangan selesai! Skor akhir: ",
+    choices:[
+      {text:"Main Lagi", next:null}
+    ]
+  }
+];
+
+// ======= FUNGSI GAME =======
+function showEvent(id){
+  if(!id){location.reload(); return;}
+  const event = events.find(e=>e.id===id);
+  if(!event) return;
+
+  if(event.hpChange) player.hp += event.hpChange;
+  if(event.scoreChange) player.score += event.scoreChange;
+
+  document.getElementById("story").innerHTML = event.text + (id==="ending1"?player.score:"");
+  document.getElementById("choices").innerHTML = "";
+
+  event.choices.forEach(c=>{
+    const btn = document.createElement("button");
+    btn.className="btn";
+    btn.innerText=c.text;
+    btn.onclick = ()=>{
+      if(c.action) c.action();
+      showEvent(c.next);
+    }
+    document.getElementById("choices").appendChild(btn);
+  });
+
+  updateStatus();
+  updateInventory();
+}
+
+function updateStatus(){
+  document.getElementById("hp").innerText = player.hp;
+  document.getElementById("score").innerText = player.score;
+}
+
+// Start game
+showEvent("start");
+</script>
+</body>
+</html>
