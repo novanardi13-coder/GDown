@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Kipas Teks</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #222;
+      color: #fff;
+      font-family: monospace;
+      font-size: 24px;
+    }
+
+    #kipas {
+      transform-origin: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 13px;
+      width: 25vw;
+      cursor: pointer;
+      transform: translateY(-250px);
+    }
+
+    #speedDisplay {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="kipas">=====🌀=====</div>
+
+  <div>
+    <button id="increase">Tambah Kecepatan</button>
+    <button id="decrease">Kurangi Kecepatan</button>
+    <button id="reverse">Balik Arah</button>
+  </div>
+
+  <div id="speedDisplay">Kecepatan: 2° per frame</div>
+
+  <script>
+    const kipas = document.getElementById('kipas');
+    const speedDisplay = document.getElementById('speedDisplay');
+
+    let angle = 0;
+    let speed = 2;
+    
+    function animate() {
+      angle += speed;
+      kipas.style.transform = `rotate(${angle}deg)`;
+      requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    document.getElementById('increase').addEventListener('click', () => {
+      speed += 1;
+      speedDisplay.textContent = `Kecepatan: ${speed}° per frame`;
+    });
+    
+    document.getElementById('decrease').addEventListener('click', () => {
+      speed -= 1;
+      speedDisplay.textContent = `Kecepatan: ${speed}° per frame`;
+    });
+    
+    document.getElementById('reverse').addEventListener('click', () => {
+      speed = -speed;
+      speedDisplay.textContent = `Kecepatan: ${speed}° per frame`;
+    });
+  </script>
+
+</body>
+</html>
