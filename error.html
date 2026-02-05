@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error Game</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+      font-family: sans-serif;
+    }
+    .floating-text {
+      position: absolute;
+      font-size: 24px;
+      font-weight: bold;
+      user-select: none;
+    }
+    #win {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+      color: lime;
+      display: none;
+      text-shadow: 2px 2px 5px black;
+    }
+  </style>
+</head>
+<body>
+<div id="win">YOU WIN!</div>
+
+<script>
+const texts = ["B", "E", "R", "T", "A", "H", "A", "N", "L", "A", "H", "1", "0", "M", "E", "N", "I", "T"];
+const colors = ["red", "lime", "cyan", "yellow", "magenta", "orange", "white"];
+const floatingTexts = [];
+
+for(let i = 0; i < 30; i++){
+  const span = document.createElement("span");
+  span.className = "floating-text";
+  span.textContent = texts[Math.floor(Math.random() * texts.length)];
+  span.style.color = colors[Math.floor(Math.random() * colors.length)];
+  span.style.left = Math.random() * window.innerWidth + "px";
+  span.style.top = Math.random() * window.innerHeight + "px";
+  document.body.appendChild(span);
+
+  const dx = (Math.random() - 0.5) * 5;
+  const dy = (Math.random() - 0.5) * 5;
+  
+  floatingTexts.push({el: span, dx, dy});
+}
+
+function animate(){
+  floatingTexts.forEach(obj => {
+    let x = parseFloat(obj.el.style.left);
+    let y = parseFloat(obj.el.style.top);
+    
+    x += obj.dx;
+    y += obj.dy;
+    
+    if(x < 0 || x > window.innerWidth - obj.el.offsetWidth) obj.dx *= -1;
+    if(y < 0 || y > window.innerHeight - obj.el.offsetHeight) obj.dy *= -1;
+    
+    obj.el.style.left = x + "px";
+    obj.el.style.top = y + "px";
+  });
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+let startTime = Date.now();
+let gameDuration = 10 * 60 * 1000;
+const winEl = document.getElementById("win");
+
+function checkWin(){
+  let elapsed = Date.now() - startTime;
+  if(elapsed >= gameDuration){
+    winEl.style.display = "block";
+  } else {
+    requestAnimationFrame(checkWin);
+  }
+}
+
+checkWin();
+</script>
+</body>
+</html>
