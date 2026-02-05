@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DVD GAME</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: black;
+    }
+    
+    #dvd {
+      position: absolute;
+      width: 120px;
+      height: 60px;
+      background: red;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      border-radius: 10px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="dvd">DVD</div>
+  
+  <script>
+    const dvd = document.getElementById('dvd');
+    
+    let x = 100;
+    let y = 100;
+    let dx = 1;
+    let dy = 1;
+    
+    function randomColor() {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+      return `rgb(${r},${g},${b})`;
+    }
+    
+    function moveDVD() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      
+      x += dx;
+      y += dy;
+      
+      let hit = false;
+      if (x + dvd.offsetWidth >= width || x <= 0) {
+        dx = -dx;
+        hit = true;
+      }
+      if (y + dvd.offsetHeight >= height || y <= 0) {
+        dy = -dy;
+        hit = true;
+      }
+
+      if (hit) {
+        dvd.style.background = randomColor();
+      }
+
+      dvd.style.left = x + "px";
+      dvd.style.top = y + "px";
+
+      requestAnimationFrame(moveDVD);
+    }
+
+    moveDVD();
+  </script>
+</body>
+</html>
